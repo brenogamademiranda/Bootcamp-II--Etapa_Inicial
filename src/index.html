@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Hidratação Diária - Controle de Água</title>
-    <link rel="stylesheet" href="estyle.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -21,10 +21,12 @@
         <div class="meta-label">
             🎯 Meta diária:
         </div>
-        <div style="display: flex; gap: 8px; align-items: center;">
+        <div class="meta-controls-wrapper">
             <div class="meta-input-group">
-                <input type="number" id="metaValue" step="100" value="2000">
-                <select id="metaUnit">
+                <label for="metaValue" style="display: none;">Valor da meta</label>
+                <input type="number" id="metaValue" step="100" value="2000" title="Digite o valor da meta de hidratação">
+                <label for="metaUnit" style="display: none;">Unidade da meta</label>
+                <select id="metaUnit" title="Selecione a unidade (ml ou litros)">
                     <option value="ml">ml</option>
                     <option value="litros">litros</option>
                 </select>
@@ -55,12 +57,13 @@
         </div>
         <div class="input-row">
             <div class="amount-input">
-                <input type="number" id="amountInput" placeholder="Quantidade" value="250" step="50">
+                <label for="amountInput" style="display: none;">Quantidade de água</label>
+                <input type="number" id="amountInput" placeholder="Quantidade" value="250" step="50" title="Digite a quantidade de água em ml">
                 <span id="registroUnidadeLabel">ml</span>
             </div>
             <button class="btn-add" id="addRecordBtn">+ Adicionar</button>
         </div>
-        <div style="font-size: 0.7rem; margin-top: 8px; color:#475569;">
+        <div class="input-caption">
             * O horário será salvo automaticamente
         </div>
     </div>

@@ -21,6 +21,7 @@ body {
     border-radius: 2rem;
     box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
     overflow: hidden;
+    -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
     transition: all 0.2s;
 }
@@ -336,4 +337,18 @@ button {
 /* ícone pequeno de sucesso */
 .badge-success {
     background: #22c55e;
+}
+
+/* wrapper para controles de meta */
+.meta-controls-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* caption para inputs */
+.input-caption {
+    font-size: 0.7rem;
+    margin-top: 8px;
+    color: #475569;
 }
