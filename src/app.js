@@ -8,15 +8,17 @@ let state = {
 };
 
 // 🔒 DOM (PROTEGIDO)
-let currentAmountEl, goalAmountEl, remainingAmountEl, progressBarEl, progressPercentageEl, historyListEl;
+const getDOMElements = () => ({
+    currentAmount: typeof document !== 'undefined' ? document.getElementById('currentAmount') : null,
+    goalAmount: typeof document !== 'undefined' ? document.getElementById('goalAmount') : null,
+    remainingAmount: typeof document !== 'undefined' ? document.getElementById('remainingAmount') : null,
+    progressBar: typeof document !== 'undefined' ? document.getElementById('progressBar') : null,
+    progressPercentage: typeof document !== 'undefined' ? document.getElementById('progressPercentage') : null,
+    historyList: typeof document !== 'undefined' ? document.getElementById('historyList') : null
+});
 
 if (typeof document !== 'undefined') {
-    currentAmountEl = document.getElementById('currentAmount');
-    goalAmountEl = document.getElementById('goalAmount');
-    remainingAmountEl = document.getElementById('remainingAmount');
-    progressBarEl = document.getElementById('progressBar');
-    progressPercentageEl = document.getElementById('progressPercentage');
-    historyListEl = document.getElementById('historyList');
+    getDOMElements();
 }
 
 function loadState() {
@@ -36,14 +38,6 @@ function loadState() {
 function saveState() {
     if (typeof localStorage === 'undefined') return;
     localStorage.setItem(STATE_KEY, JSON.stringify(state));
-}
-
-function addWater(amount) {
-    state.logs.push({
-        amount: parseInt(amount),
-        time: Date.now()
-    });
-    saveState();
 }
 
 function getTotal(logs = state.logs) {
@@ -74,4 +68,4 @@ if (typeof document !== 'undefined') {
 }
 
 // ✅ EXPORT PARA TESTE
-module.exports = { getTotal, getIntervalText };
+module.exports = { getTotal, getIntervalText, saveState, loadState };

@@ -2,7 +2,8 @@
   "name": "bootcamp-2",
   "version": "1.0.0",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "jest": "^30.3.0",
