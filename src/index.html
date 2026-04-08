@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Hidratação Diária - Controle de Água</title>
+    <link rel="stylesheet" href="estyle.css">
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>
+            <span>💧</span> Água em Dia
+        </h1>
+        <div class="sub">Registre, acompanhe e atinja sua meta</div>
+    </div>
+
+    <!-- Meta diária -->
+    <div class="meta-section">
+        <div class="meta-label">
+            🎯 Meta diária:
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="meta-input-group">
+                <input type="number" id="metaValue" step="100" value="2000">
+                <select id="metaUnit">
+                    <option value="ml">ml</option>
+                    <option value="litros">litros</option>
+                </select>
+            </div>
+            <button class="btn-meta" id="setMetaBtn">Definir</button>
+        </div>
+    </div>
+
+    <!-- Progresso principal -->
+    <div class="progress-card">
+        <div class="stats">
+            <span>💧 Consumido: <strong id="consumidoHoje">0</strong> <span id="consumidoUnidade">ml</span></span>
+            <span>🎯 Meta: <strong id="metaExibida">2000</strong> <span id="metaUnidadeExibida">ml</span></span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-fill" id="progressFillBar">0%</div>
+        </div>
+        <div class="percentage-text">
+            <span id="porcentagemTexto">0%</span> da meta atingida • 
+            <span id="faltandoTexto">Faltam 2000 ml</span>
+        </div>
+    </div>
+
+    <!-- registro manual -->
+    <div class="add-section">
+        <div class="add-title">
+            📝 Registrar consumo
+        </div>
+        <div class="input-row">
+            <div class="amount-input">
+                <input type="number" id="amountInput" placeholder="Quantidade" value="250" step="50">
+                <span id="registroUnidadeLabel">ml</span>
+            </div>
+            <button class="btn-add" id="addRecordBtn">+ Adicionar</button>
+        </div>
+        <div style="font-size: 0.7rem; margin-top: 8px; color:#475569;">
+            * O horário será salvo automaticamente
+        </div>
+    </div>
+
+    <!-- intervalo entre registros -->
+    <div class="interval-box">
+        <span>⏱️ Intervalo médio entre registros (hoje):</span>
+        <span class="badge-interval" id="intervalDisplay">--</span>
+    </div>
+
+    <!-- histórico linha do tempo -->
+    <div class="history-title">
+        📋 Histórico de hoje
+    </div>
+    <div class="timeline" id="timelineList">
+        <div class="empty-history">Nenhum registro ainda. Adicione sua primeira água! 💧</div>
+    </div>
+    <div class="reset-info">
+        🔄 Os dados são resetados automaticamente à meia-noite (com base no seu navegador).
+    </div>
+</div>
+
+<script>
+    // ---------- CONFIGURAÇÕES E ESTADO ----------
+    // Chaves do localStorage
+    const STORAGE_RECORDS = 'hydration_records';
+    const STORAGE_META_ML = 'hydration_meta_ml';
+    const STORAGE_LAST_DATE = 'hydration_last_date';
+
+    // variáveis principais
+    let dailyRecords = [];       // array de objetos { timestamp: number, amountMl: number }
+    let dailyGoalMl = 2000;     // padrão 2 litros = 2000ml
+    let currentDateKey = '';    // YYYY-MM-DD para controle de reset diário
+
+    // elementos DOM
+    const consumidoSpan = document.getElementById('consumidoHoje');
+    const metaExibidaSpan = document.getElementById('metaExibida');
+    const metaUnidadeExibidaSpan = document.getElementById('metaUnidadeExibida');
+    const progressFillBar = document.getElementById('progressFillBar');
+    const porcentagemTexto = document.getElementById('porcentagemTexto');
+    const faltandoTexto = document.getElementById('faltandoTexto');
+    const timelineContainer = document.getElementById('timelineList');
+    const intervalDisplaySpan = document.getElementById('intervalDisplay');
+    const consumidoUnidadeSpan = document.getElementById('consumidoUnidade');
+    const registroUnidadeLabel = document.getElementById('registroUnidadeLabel');
+    const metaValueInput = document.getElementById('metaValue');
+    const metaUnitSelect = document.getElementById('metaUnit');
+
+    // helper: obter data atual como string 'YYYY-MM-DD'
+    function getTodayKey() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // reset automático se o dia mudou
+    function checkAndResetIfNewDay() {
+        const todayKey = getTodayKey();
+        const storedLastDate = localStorage.getItem(STORAGE_LAST_DATE);
+        
+        if (storedLastDate !== todayKey) {
+            // Novo dia: limpa registros, mas mantém a meta salva
+            dailyRecords = [];
+            saveRecordsToLocal();
+            localStorage.setItem(STORAGE_LAST_DATE, todayKey);
+            return true; // reset aconteceu
+        }
+        return false; // mesmo dia
+    }
+
+    // carregar meta salva
+    function loadGoal() {
+        const savedGoal = localStorage.getItem(STORAGE_META_ML);
+        if (savedGoal !== null && !isNaN(parseFloat(savedGoal))) {
+            dailyGoalMl = parseFloat(savedGoal);
+        } else {
+            dailyGoalMl = 2000;
+        }
+        // atualizar os campos de meta na UI
+        updateGoalUI();
+    }
+
+    // atualizar elementos visuais da meta (exibição e input)
+    function updateGoalUI() {
+        if (dailyGoalMl >= 1000 && dailyGoalMl % 1000 === 0) {
+            // se for múltiplo de 1000, exibe em litros bonito
+            const litros = dailyGoalMl / 1000;
+            metaExibidaSpan.innerText = litros;
+            metaUnidadeExibidaSpan.innerText = 'L';
+            // no input também
+            metaValueInput.value = litros;
+            metaUnitSelect.value = 'litros';
+        } else {
+            metaExibidaSpan.innerText = dailyGoalMl;
+            metaUnidadeExibidaSpan.innerText = 'ml';
+            metaValueInput.value = dailyGoalMl;
+            metaUnitSelect.value = 'ml';
+        }
+        // Atualizar unidade do registro (para ml sempre)
+        registroUnidadeLabel.innerText = 'ml';
+        consumidoUnidadeSpan.innerText = dailyGoalMl >= 1000 && dailyGoalMl % 1000 === 0 ? 'L' : 'ml';
+        // Recalcular progresso e exibição
+        updateProgressAndStats();
+    }
+
+    // salvar registros atuais no localStorage
+    function saveRecordsToLocal() {
+        localStorage.setItem(STORAGE_RECORDS, JSON.stringify(dailyRecords));
+    }
+
+    // carregar registros do dia atual (já filtrado por reset)
+    function loadRecords() {
+        const stored = localStorage.getItem(STORAGE_RECORDS);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) {
+                    // garantir que cada item tem timestamp e amountMl
+                    dailyRecords = parsed.filter(r => typeof r?.timestamp === 'number' && typeof r?.amountMl === 'number');
+                } else {
+                    dailyRecords = [];
+                }
+            } catch(e) { dailyRecords = []; }
+        } else {
+            dailyRecords = [];
+        }
+    }
+
+    // calcular total consumido hoje (ml)
+    function getTotalConsumedMl() {
+        return dailyRecords.reduce((sum, rec) => sum + rec.amountMl, 0);
+    }
+
+    // calcular intervalo médio entre registros (em minutos ou string legível)
+    function getAverageInterval() {
+        if (dailyRecords.length < 2) return null;
+        // ordenar por timestamp crescente
+        const sorted = [...dailyRecords].sort((a,b) => a.timestamp - b.timestamp);
+        let totalDiffMinutes = 0;
+        for (let i = 1; i < sorted.length; i++) {
+            const diffMs = sorted[i].timestamp - sorted[i-1].timestamp;
+            const diffMin = diffMs / (1000 * 60);
+            totalDiffMinutes += diffMin;
+        }
+        const avgMinutes = totalDiffMinutes / (sorted.length - 1);
+        return avgMinutes;
+    }
+
+    // formatar intervalo para exibição amigável
+    function formatInterval(avgMinutes) {
+        if (avgMinutes === null) return "⏳ Ainda poucos registros";
+        if (avgMinutes < 1) return `${Math.round(avgMinutes * 60)} segundos`;
+        if (avgMinutes < 60) return `${Math.floor(avgMinutes)} min ${Math.round((avgMinutes % 1)*60)}s`;
+        const hours = Math.floor(avgMinutes / 60);
+        const mins = Math.round(avgMinutes % 60);
+        return `${hours}h ${mins}min`;
+    }
+
+    // atualizar barra de progresso, textos, intervalo e histórico
+    function updateProgressAndStats() {
+        const totalMl = getTotalConsumedMl();
+        let percent = (totalMl / dailyGoalMl) * 100;
+        percent = Math.min(100, percent);
+        const percentFixed = percent.toFixed(1);
+        
+        // Atualizar textos consumido (com unidade adequada)
+        let displayTotal = totalMl;
+        let totalUnit = 'ml';
+        let metaDisplayVal = dailyGoalMl;
+        let metaUnitDisplay = 'ml';
+        
+        if (dailyGoalMl >= 1000 && dailyGoalMl % 1000 === 0 && totalMl >= 1000) {
+            // Se meta for litro redondo, exibir ambos em litros
+            const totalLitros = totalMl / 1000;
+            displayTotal = totalLitros.toFixed(2);
+            totalUnit = 'L';
+            metaDisplayVal = dailyGoalMl / 1000;
+            metaUnitDisplay = 'L';
+            consumidoUnidadeSpan.innerText = 'L';
+            metaUnidadeExibidaSpan.innerText = 'L';
+            metaExibidaSpan.innerText = metaDisplayVal;
+        } else if (dailyGoalMl >= 1000 && dailyGoalMl % 1000 === 0 && totalMl < 1000) {
+            // meta litros redonda mas total pequeno -> mantém ml para consumo mais preciso
+            displayTotal = totalMl;
+            totalUnit = 'ml';
+            consumidoUnidadeSpan.innerText = 'ml';
+            metaExibidaSpan.innerText = dailyGoalMl/1000;
+            metaUnidadeExibidaSpan.innerText = 'L';
+        } else {
+            consumidoUnidadeSpan.innerText = 'ml';
+            metaUnidadeExibidaSpan.innerText = 'ml';
+            metaExibidaSpan.innerText = dailyGoalMl;
+        }
+        
+        consumidoSpan.innerText = (typeof displayTotal === 'number' && displayTotal % 1 !== 0) ? displayTotal : Math.floor(displayTotal);
+        
+        // Faltante
+        let faltaMl = dailyGoalMl - totalMl;
+        if (faltaMl < 0) faltaMl = 0;
+        let faltaText = '';
+        if (dailyGoalMl >= 1000 && dailyGoalMl % 1000 === 0 && faltaMl >= 1000) {
+            faltaText = `Faltam ${(faltaMl/1000).toFixed(1)} L`;
+        } else if (dailyGoalMl >= 1000 && dailyGoalMl % 1000 === 0 && faltaMl < 1000) {
+            faltaText = `Faltam ${faltaMl} ml`;
+        } else {
+            faltaText = `Faltam ${faltaMl} ml`;
+        }
+        faltandoTexto.innerText = faltaText;
+        porcentagemTexto.innerText = `${percentFixed}%`;
+        
+        // Barra de progresso
+        const fillPercent = percent;
+        progressFillBar.style.width = `${fillPercent}%`;
+        progressFillBar.innerText = fillPercent >= 15 ? `${Math.floor(fillPercent)}%` : '';
+        
+        // Atualizar intervalo médio
+        const avgInterval = getAverageInterval();
+        if (avgInterval !== null) {
+            intervalDisplaySpan.innerText = formatInterval(avgInterval);
+        } else {
+            intervalDisplaySpan.innerText = dailyRecords.length < 2 ? "Registre ao menos 2 vezes" : "--";
+        }
+        
+        // atualizar lista histórica (timeline)
+        renderTimeline();
+    }
+    
+    // renderizar linha do tempo com todos os registros do dia
+    function renderTimeline() {
+        if (!timelineContainer) return;
+        if (dailyRecords.length === 0) {
+            timelineContainer.innerHTML = `<div class="empty-history">✨ Nenhum registro ainda. Adicione sua primeira água! 💧</div>`;
+            return;
+        }
+        
+        // ordenar por timestamp decrescente (mais recente primeiro)
+        const sorted = [...dailyRecords].sort((a,b) => b.timestamp - a.timestamp);
+        const timelineHtml = sorted.map(record => {
+            const date = new Date(record.timestamp);
+            const horas = date.getHours().toString().padStart(2,'0');
+            const minutos = date.getMinutes().toString().padStart(2,'0');
+            const segundos = date.getSeconds().toString().padStart(2,'0');
+            const horaStr = `${horas}:${minutos}:${segundos}`;
+            let amountShow = record.amountMl;
+            let unitShow = 'ml';
+            if (dailyGoalMl >= 1000 && dailyGoalMl % 1000 === 0 && record.amountMl >= 1000) {
+                amountShow = (record.amountMl / 1000).toFixed(2);
+                unitShow = 'L';
+            } else if (dailyGoalMl >= 1000 && dailyGoalMl % 1000 === 0 && record.amountMl < 1000) {
+                amountShow = record.amountMl;
+                unitShow = 'ml';
+            } else {
+                amountShow = record.amountMl;
+                unitShow = 'ml';
+            }
+            return `
+                <div class="registro-item">
+                    <div class="registro-hora">🕒 ${horaStr}</div>
+                    <div class="registro-qtd">+ ${amountShow} ${unitShow}</div>
+                </div>
+            `;
+        }).join('');
+        timelineContainer.innerHTML = timelineHtml;
+    }
+    
+    // adicionar novo registro
+    function addRecord(amountMl) {
+        if (isNaN(amountMl) || amountMl <= 0) {
+            alert("Por favor, insira uma quantidade válida (maior que zero).");
+            return false;
+        }
+        if (amountMl > 5000) {
+            if (!confirm("Você está adicionando mais de 5 litros de uma vez. Deseja continuar?")) return false;
+        }
+        const newRecord = {
+            timestamp: Date.now(),
+            amountMl: amountMl
+        };
+        dailyRecords.push(newRecord);
+        saveRecordsToLocal();
+        updateProgressAndStats();
+        return true;
+    }
+    
+    // definir nova meta (em ml)
+    function setMetaFromInput() {
+        let rawValue = parseFloat(metaValueInput.value);
+        if (isNaN(rawValue) || rawValue <= 0) {
+            alert("Digite uma meta válida maior que zero.");
+            return;
+        }
+        const unit = metaUnitSelect.value;
+        let goalMl = 0;
+        if (unit === 'litros') {
+            goalMl = rawValue * 1000;
+        } else {
+            goalMl = rawValue;
+        }
+        if (goalMl < 50) {
+            alert("Meta muito baixa! Defina pelo menos 50 ml.");
+            return;
+        }
+        dailyGoalMl = goalMl;
+        localStorage.setItem(STORAGE_META_ML, dailyGoalMl);
+        updateGoalUI();
+        updateProgressAndStats(); // atualiza consumo e percentuais com nova meta
+    }
+    
+    // inicialização completa: reset diário, carrega dados, atualiza UI
+    function init() {
+        // Verificar reset automático (limpeza se novo dia)
+        const didReset = checkAndResetIfNewDay();
+        // Carregar meta
+        loadGoal();
+        // Carregar registros (já possivelmente resetados se dia novo)
+        loadRecords();
+        // Se o reset ocorreu mas ainda havia meta preservada, os registros já estão vazios.
+        // Se não houve reset, registros são os do dia atual.
+        // Garantir que o lastDate fique correto
+        if (didReset) {
+            // Ao resetar, salvamos array vazio e atualizamos a data novamente
+            saveRecordsToLocal();
+            localStorage.setItem(STORAGE_LAST_DATE, getTodayKey());
+        } else {
+            // só garantir que a data está armazenada
+            localStorage.setItem(STORAGE_LAST_DATE, getTodayKey());
+        }
+        // atualizar interface completa
+        updateGoalUI();
+        updateProgressAndStats();
+        
+        // evento botão adicionar
+        const addBtn = document.getElementById('addRecordBtn');
+        const amountInput = document.getElementById('amountInput');
+        addBtn.addEventListener('click', () => {
+            let val = parseFloat(amountInput.value);
+            if (isNaN(val)) val = 0;
+            // unidade do registro sempre ml
+            addRecord(val);
+            amountInput.value = 250; // valor padrão conveniente
+        });
+        
+        // evento botão meta
+        const setMetaBtn = document.getElementById('setMetaBtn');
+        setMetaBtn.addEventListener('click', setMetaFromInput);
+        
+        // Atualizar exibição da unidade de registro quando meta mudar visualmente? já está ok.
+    }
+    
+    // Iniciar tudo quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', init);
+
+    
+
+
+</script>
+</body>
+</html>
