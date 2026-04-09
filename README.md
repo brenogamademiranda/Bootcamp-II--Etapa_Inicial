@@ -82,16 +82,3 @@ v1.0.0
 
 Breno Gama de Miranda
 
-🔗 Link do Repositório Público
-
-👉 (coloque aqui quando subir no GitHub)
-
-Exemplo:
-
-https://github.com/seu-usuario/agua-em-dia
-🚀 Melhorias Futuras (opcional - diferencial)
-Notificações para lembrar de beber água
-Gráficos semanais/mensais
-Login de usuário
-Versão mobile (PWA)
-Integração com smartwatch
