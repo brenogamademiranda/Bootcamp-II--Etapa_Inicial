@@ -46,7 +46,7 @@ JavaScript (Vanilla JS)
 LocalStorage (armazenamento no navegador)
 📥 Instruções de Instalação
 Baixe ou clone o repositório:
-git clone https://github.com/seu-usuario/agua-em-dia.git
+
 Acesse a pasta do projeto:
 cd agua-em-dia
 ▶️ Instruções de Execução
