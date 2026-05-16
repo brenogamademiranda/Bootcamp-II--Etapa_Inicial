@@ -2,7 +2,6 @@ const STATE_KEY = 'waterTrackerData';
 const DEFAULT_GOAL = 2000;
 
 let state = {
-    date: new Date().toLocaleDateString(),
     date: typeof new Date() !== 'undefined' ? new Date().toLocaleDateString() : '',
     goal: DEFAULT_GOAL,
     logs: []

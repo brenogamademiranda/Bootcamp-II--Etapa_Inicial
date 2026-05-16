@@ -1,4 +1,4 @@
-const { getTotal, getIntervalText } = require('../app.js');
+const { getTotal, getIntervalText } = require('../../app.js');
 
 test('soma total de água', () => {
     const logs = [
