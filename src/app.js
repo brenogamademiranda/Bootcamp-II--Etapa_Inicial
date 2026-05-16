@@ -2,7 +2,7 @@ const STATE_KEY = 'waterTrackerData';
 const DEFAULT_GOAL = 2000;
 
 let state = {
-    date: new Date().toLocaleDateString(),
+    date: typeof new Date() !== 'undefined' ? new Date().toLocaleDateString() : '',
     goal: DEFAULT_GOAL,
     logs: []
 };
@@ -16,10 +16,6 @@ const getDOMElements = () => ({
     progressPercentage: typeof document !== 'undefined' ? document.getElementById('progressPercentage') : null,
     historyList: typeof document !== 'undefined' ? document.getElementById('historyList') : null
 });
-
-if (typeof document !== 'undefined') {
-    getDOMElements();
-}
 
 function loadState() {
     if (typeof localStorage === 'undefined') return;
@@ -57,15 +53,37 @@ function getIntervalText(prevTimestamp, currentTimestamp) {
     return `+${minutes}m`;
 }
 
+async function loadWeather() {
+    try {
+        if (typeof fetch === 'undefined') return;
+
+        const response = await fetch(
+            'https://api.open-meteo.com/v1/forecast?latitude=-15.78&longitude=-47.93&current_weather=true'
+        );
+
+        const data = await response.json();
+
+        console.log(
+            `Temperatura atual: ${data.current_weather.temperature}°C`
+        );
+
+    } catch (error) {
+        console.error('Erro ao buscar clima:', error);
+    }
+}
+
 // 🔒 INIT PROTEGIDO
 function init() {
     loadState();
 }
 
-// só roda no navegador
-if (typeof document !== 'undefined') {
+// Só executa a inicialização se estiver no navegador e não em ambiente de testes (Node/Jest)
+if (typeof document !== 'undefined' && typeof process === 'undefined') {
     init();
+    loadWeather();
 }
 
 // ✅ EXPORT PARA TESTE
-module.exports = { getTotal, getIntervalText, saveState, loadState };
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { getTotal, getIntervalText, saveState, loadState };
+}

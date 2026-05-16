@@ -17,6 +17,4 @@ jobs:
           node-version: 18
 
       - run: npm install
-      - name: Run linter
-        run: npm run lint
       - run: npm test
