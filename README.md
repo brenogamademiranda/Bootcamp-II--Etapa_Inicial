@@ -46,7 +46,7 @@ JavaScript (Vanilla JS)
 LocalStorage (armazenamento no navegador)
 📥 Instruções de Instalação
 Baixe ou clone o repositório:
-git clone https://github.com/seu-usuario/agua-em-dia.git
+
 Acesse a pasta do projeto:
 cd agua-em-dia
 ▶️ Instruções de Execução
@@ -82,16 +82,3 @@ v1.0.0
 
 Breno Gama de Miranda
 
-🔗 Link do Repositório Público
-
-👉 (coloque aqui quando subir no GitHub)
-
-Exemplo:
-
-https://github.com/seu-usuario/agua-em-dia
-🚀 Melhorias Futuras (opcional - diferencial)
-Notificações para lembrar de beber água
-Gráficos semanais/mensais
-Login de usuário
-Versão mobile (PWA)
-Integração com smartwatch
