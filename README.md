@@ -1,4 +1,4 @@
-# Bootcamp-II--Etapa_Inicial
+# Bootcamp-II--Etapa_Intermediaria 
 Web App Controle de Hidratação Pessoal (Controlar a hidratação da humanidade) 
 
 💧 Água em Dia
@@ -70,11 +70,20 @@ Implementar testes com Jest ou Vitest
 
 Atualmente o projeto não possui configuração de lint.
 
+## Deploy Online
+https://bootcamp-ii-etapa-inicial-git-entrega-intermediaria-breno12.vercel.app/
+
+
+
 Sugestão futura:
 
 npm install eslint --save-dev
 npx eslint .
-📦 Versão Atual
+📦 Versão Atual 1.2
+
+
+
+
 
 v1.0.0
 
