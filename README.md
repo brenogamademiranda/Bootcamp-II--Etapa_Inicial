@@ -71,7 +71,9 @@ Implementar testes com Jest ou Vitest
 Atualmente o projeto não possui configuração de lint.
 
 ## Deploy Online
-https://bootcamp-ii-etapa-inicial-git-entrega-intermediaria-breno12.vercel.app/
+https://bootcamp-ii-etapa-inicial-lbaz.vercel.app/.
+
+
 
 
 
@@ -85,9 +87,10 @@ npx eslint .
 
 
 
-v1.0.0
 
-👨‍💻 Nome do Autor
+
+👨‍💻 Nome do Desenvolvedor 
+
 
 Breno Gama de Miranda
 
