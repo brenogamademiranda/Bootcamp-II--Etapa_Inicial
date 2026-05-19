@@ -73,6 +73,10 @@ Atualmente o projeto não possui configuração de lint.
 ## Deploy Online
 https://bootcamp-ii-etapa-inicial-lbaz.vercel.app/.
 
+https://deploy-preview-3--cozy-halva-ed64da.netlify.app
+
+
+
 
 
 
