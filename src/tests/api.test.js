@@ -17,4 +17,30 @@ test('API responde corretamente', async () => {
     expect(data.current_weather).toBeDefined();
     expect(data.current_weather.temperature).toBe(25);
     expect(fetch).toHaveBeenCalledTimes(1);
+
+    
+});
+
+const { saveRecordToSupabase, loadRecordsFromSupabase } = require('../../app.js');
+
+test('salva registro de hidratação no Supabase', async () => {
+    global.fetch = jest.fn(() =>
+        Promise.resolve({
+            json: () => Promise.resolve([{ id: 1, amount_ml: 250 }])
+        })
+    );
+    const result = await saveRecordToSupabase(250);
+    expect(result[0].amount_ml).toBe(250);
+    expect(fetch).toHaveBeenCalledTimes(1);
+});
+
+test('carrega registros de hidratação do Supabase', async () => {
+    global.fetch = jest.fn(() =>
+        Promise.resolve({
+            json: () => Promise.resolve([{ id: 1, amount_ml: 200, created_at: new Date().toISOString() }])
+        })
+    );
+    const result = await loadRecordsFromSupabase();
+    expect(Array.isArray(result)).toBe(true);
+    expect(result[0].amount_ml).toBe(200);
 });

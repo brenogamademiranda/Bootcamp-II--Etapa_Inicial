@@ -1,3 +1,45 @@
+const SUPABASE_URL = 'https://pabdubdpdiyhitsrlvva.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JKZaA3If7Vn2g-gFL3uykg_wqqa3Waj';
+
+async function saveRecordToSupabase(amountMl) {
+    if (typeof fetch === 'undefined') return null;
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/hydration_logs`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({ amount_ml: amountMl })
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao salvar no Supabase:', error);
+        return null;
+    }
+}
+
+async function loadRecordsFromSupabase() {
+    if (typeof fetch === 'undefined') return [];
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/hydration_logs?select=*&created_at=gte.${today}&order=created_at.desc`,
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            }
+        );
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao carregar do Supabase:', error);
+        return [];
+    }
+}
 const STATE_KEY = 'waterTrackerData';
 const DEFAULT_GOAL = 2000;
 
@@ -85,5 +127,5 @@ if (typeof document !== 'undefined' && typeof process === 'undefined') {
 
 // ✅ EXPORT PARA TESTE
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { getTotal, getIntervalText, saveState, loadState };
+    module.exports = { getTotal, getIntervalText, saveState, loadState, saveRecordToSupabase, loadRecordsFromSupabase };
 }

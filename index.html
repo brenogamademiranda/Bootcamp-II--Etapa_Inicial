@@ -90,6 +90,8 @@
     // ---------- CONFIGURAÇÕES E ESTADO ----------
     // Chaves do localStorage
     const STORAGE_RECORDS = 'hydration_records';
+    const SUPABASE_URL = 'https://pabdubdpdiyhitsrlvva.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_JKZaA3If7Vn2g-gFL3uykg_wqqa3Waj';
     const STORAGE_META_ML = 'hydration_meta_ml';
     const STORAGE_LAST_DATE = 'hydration_last_date';
 
@@ -332,7 +334,7 @@
     }
     
     // adicionar novo registro
-    function addRecord(amountMl) {
+   async function addRecord(amountMl) {
         if (isNaN(amountMl) || amountMl <= 0) {
             alert("Por favor, insira uma quantidade válida (maior que zero).");
             return false;
@@ -347,6 +349,22 @@
         dailyRecords.push(newRecord);
         saveRecordsToLocal();
         updateProgressAndStats();
+
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/hydration_logs`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({ amount_ml: amountMl })
+            });
+        } catch (e) {
+            console.error('Erro ao salvar no Supabase:', e);
+        }
+
         return true;
     }
     
@@ -374,7 +392,33 @@
         updateProgressAndStats(); // atualiza consumo e percentuais com nova meta
     }
     
-    // inicialização completa: reset diário, carrega dados, atualiza UI
+   
+    async function loadRecordsFromCloud() {
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const response = await fetch(
+                `${SUPABASE_URL}/rest/v1/hydration_logs?select=*&created_at=gte.${today}&order=created_at.asc`,
+                {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                }
+            );
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+                dailyRecords = data.map(r => ({
+                    timestamp: new Date(r.created_at).getTime(),
+                    amountMl: r.amount_ml
+                }));
+                saveRecordsToLocal();
+                updateProgressAndStats();
+            }
+        } catch (e) {
+            console.error('Erro ao carregar do Supabase:', e);
+        }
+    }
+
     function init() {
         // Verificar reset automático (limpeza se novo dia)
         const didReset = checkAndResetIfNewDay();
@@ -411,15 +455,13 @@
         // evento botão meta
         const setMetaBtn = document.getElementById('setMetaBtn');
         setMetaBtn.addEventListener('click', setMetaFromInput);
-        
-        // Atualizar exibição da unidade de registro quando meta mudar visualmente? já está ok.
+
+        // Carregar registros da nuvem (Supabase)
+        loadRecordsFromCloud();
     }
     
     // Iniciar tudo quando o DOM estiver pronto
     document.addEventListener('DOMContentLoaded', init);
-
-    
-
 
 </script>
 </body>
