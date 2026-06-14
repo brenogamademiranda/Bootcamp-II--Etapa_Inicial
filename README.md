@@ -1,100 +1,86 @@
-# Bootcamp-II--Etapa_Intermediaria 
-Web App Controle de Hidratação Pessoal (Controlar a hidratação da humanidade) 
+# Bootcamp-II--Etapa_Inicial
 
 💧 Água em Dia
-📌 Nome do Projeto
 
+## 📌 Nome do Projeto
 Água em Dia — Sistema de Controle de Hidratação Pessoal
 
-📖 Descrição do Problema Real
-
+## 📖 Descrição do Problema Real
 Muitas pessoas não conseguem manter uma rotina adequada de hidratação ao longo do dia.
 Isso acontece principalmente por falta de acompanhamento, controle de quantidade ingerida e ausência de alertas ou métricas visuais.
-
 A consequência pode ser desidratação, queda de desempenho físico e mental e problemas de saúde.
 
-💡 Proposta da Solução
-
+## 💡 Proposta da Solução
 A aplicação Água em Dia foi desenvolvida para ajudar o usuário a:
+- Registrar o consumo de água ao longo do dia
+- Definir uma meta diária personalizada
+- Visualizar o progresso em tempo real
+- Acompanhar o histórico de consumo
+- Ver o intervalo médio entre ingestões
 
-Registrar o consumo de água ao longo do dia
-Definir uma meta diária personalizada
-Visualizar o progresso em tempo real
-Acompanhar o histórico de consumo
-Ver o intervalo médio entre ingestões
+## 🎯 Público-Alvo
+- Pessoas que querem melhorar hábitos de saúde
+- Estudantes e trabalhadores com rotina intensa
+- Usuários que esquecem de beber água regularmente
+- Qualquer pessoa interessada em autocuidado
 
-Tudo isso de forma simples, visual e intuitiva.
+## ⚙️ Funcionalidades Principais
+- ✅ Definição de meta diária (ml ou litros)
+- ✅ Registro manual de consumo de água
+- ✅ Cálculo automático de porcentagem atingida
+- ✅ Barra de progresso dinâmica
+- ✅ Histórico de consumo com horário automático
+- ✅ Cálculo de intervalo médio entre registros
+- ✅ Reset automático dos dados diariamente
+- ✅ Armazenamento local (localStorage)
+- ✅ Persistência em banco de dados na nuvem (Supabase / PostgreSQL)
 
-🎯 Público-Alvo
-Pessoas que querem melhorar hábitos de saúde
-Estudantes e trabalhadores com rotina intensa
-Usuários que esquecem de beber água regularmente
-Qualquer pessoa interessada em autocuidado
-⚙️ Funcionalidades Principais
-✅ Definição de meta diária (ml ou litros)
-✅ Registro manual de consumo de água
-✅ Cálculo automático de porcentagem atingida
-✅ Barra de progresso dinâmica
-✅ Histórico de consumo com horário automático
-✅ Cálculo de intervalo médio entre registros
-✅ Reset automático dos dados diariamente
-✅ Armazenamento local (localStorage)
-🛠️ Tecnologias Utilizadas
-HTML5
-CSS3
-JavaScript (Vanilla JS)
-LocalStorage (armazenamento no navegador)
-📥 Instruções de Instalação
-Baixe ou clone o repositório:
+## 🛠️ Tecnologias Utilizadas
+- HTML5
+- CSS3
+- JavaScript (Vanilla JS)
+- LocalStorage (armazenamento no navegador)
+- Supabase (PostgreSQL) - banco de dados em nuvem
+- Jest (testes automatizados)
+- ESLint (lint)
+- GitHub Actions (CI)
+- Vercel (deploy)
 
-Acesse a pasta do projeto:
-cd agua-em-dia
-▶️ Instruções de Execução
+## 📥 Instruções de Instalação
+1. Clone o repositório:
+```bash
+git clone https://github.com/brenogamademiranda/Bootcamp-II--Etapa_Inicial.git
+```
+2. Acesse a pasta do projeto:
+```bash
+cd Bootcamp-II--Etapa_Inicial
+```
 
-Como é um projeto front-end simples, basta abrir o arquivo:
+## ▶️ Instruções de Execução
+Como é um projeto front-end simples, basta abrir o arquivo `index.html` no navegador (Chrome, Edge, etc.) ou usar a extensão "Live Server".
 
-index.html
+## ☁️ Banco de Dados (Supabase)
+A aplicação utiliza o Supabase (PostgreSQL) para persistir os registros de hidratação na nuvem, na tabela `hydration_logs` (colunas: `id`, `amount_ml`, `created_at`), com políticas de Row Level Security configuradas para leitura e escrita públicas.
 
-Ou:
+As credenciais (URL e chave pública anon) já estão configuradas no `index.html` e no `app.js`.
 
-Clique duas vezes no arquivo index.html
-Ou abra com o navegador (Chrome, Edge, etc.)
-🧪 Instruções para Rodar os Testes
+## 🧪 Instruções para Rodar os Testes
+```bash
+npm install
+npm test
+```
+Os testes são executados com Jest e cobrem as funções principais de cálculo, integração com a API de clima e integração com o Supabase (com mock de fetch).
 
-Este projeto não possui testes automatizados implementados no momento.
-
-Sugestão futura:
-
-Implementar testes com Jest ou Vitest
-🧹 Instruções para Rodar o Lint
-
-Atualmente o projeto não possui configuração de lint.
+## 🧹 Instruções para Rodar o Lint
+```bash
+npm run lint
+```
 
 ## Deploy Online
-https://bootcamp-ii-etapa-inicial-lbaz.vercel.app/.
+https://bootcamp-ii-etapa-inicial-lbaz.vercel.app/
 
-https://deploy-preview-3--cozy-halva-ed64da.netlify.app
+## 📦 Versão Atual
+1.3
 
-
-
-
-
-
-
-Sugestão futura:
-
-npm install eslint --save-dev
-npx eslint .
-📦 Versão Atual 1.2
-
-
-
-
-
-
-
-👨‍💻 Nome do Desenvolvedor 
-
-
-Breno Gama de Miranda
-
+## 👨‍💻 Integrante(s) do Grupo
+- Breno Gama de Miranda — Matrícula: 22503883
